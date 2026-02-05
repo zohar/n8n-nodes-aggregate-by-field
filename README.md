@@ -7,7 +7,7 @@ An [n8n](https://n8n.io/) community node that aggregates and groups input items 
 
 The **Aggregate By Field** node collects items that share the same value in a specified field and groups them together. This is useful for organizing data by categories, processing items in batches by type, or creating summary reports.
 
-![Aggregate By Field Node](https://raw.githubusercontent.com/zohar/n8n-nodes-aggregate-by-field/main/docs/node-preview.png)
+![Aggregate By Field Node](https://raw.githubusercontent.com/zohar/n8n-nodes-aggregate-by-field/main/screenshot.png)
 
 ## Installation
 

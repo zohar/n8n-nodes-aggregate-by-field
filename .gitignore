@@ -1,0 +1,154 @@
+# =============================================================================
+# Node.js / npm
+# =============================================================================
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# npm logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# =============================================================================
+# Build Output
+# =============================================================================
+
+# Compiled JavaScript output
+dist/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Packed npm tarball
+*.tgz
+
+# =============================================================================
+# IDE / Editors
+# =============================================================================
+
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains IDEs (WebStorm, IntelliJ, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*.swp
+*.swo
+*.swn
+*~
+
+# Emacs
+*~
+\#*\#
+.#*
+
+# =============================================================================
+# Operating System
+# =============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+
+# =============================================================================
+# Testing / Coverage
+# =============================================================================
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Jest
+jest.config.js.map
+
+# =============================================================================
+# Environment / Secrets
+# =============================================================================
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# Credentials
+*.pem
+*.key
+*.cert
+
+# =============================================================================
+# Miscellaneous
+# =============================================================================
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.temp/
+
+# Debug
+.debug/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Documentation build output
+docs/_build/
+
+# Backup files
+*.bak
+*.backup
+
+# =============================================================================
+# n8n Specific
+# =============================================================================
+
+# n8n data directory (if testing locally)
+.n8n/
+
+# Custom credentials for testing
+credentials.json

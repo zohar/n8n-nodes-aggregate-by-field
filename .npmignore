@@ -1,0 +1,20 @@
+# Source files (compiled versions are in dist/)
+nodes/
+
+# Development files
+.gitignore
+.eslintrc.js
+.prettierrc
+tsconfig.json
+gulpfile.js
+
+# IDE
+.idea/
+.vscode/
+
+# Tests
+*.test.ts
+coverage/
+
+# OS
+.DS_Store

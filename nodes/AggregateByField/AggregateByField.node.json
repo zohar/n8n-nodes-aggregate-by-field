@@ -1,0 +1,28 @@
+{
+	"node": "n8n-nodes-aggregate-by-field.aggregateByField",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": [
+		"Data Transformation"
+	],
+	"resources": {
+		"primaryDocumentation": [
+			{
+				"url": "https://github.com/your-username/n8n-nodes-aggregate-by-field"
+			}
+		]
+	},
+	"alias": [
+		"group",
+		"groupby",
+		"aggregate",
+		"collect",
+		"combine",
+		"merge"
+	],
+	"subcategories": {
+		"Data Transformation": [
+			"Aggregation"
+		]
+	}
+}

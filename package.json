@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-aggregate-by-field",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "n8n community node to aggregate/group input items by a specified field value",
 	"keywords": [
 		"n8n-community-node-package",
@@ -36,7 +36,11 @@
 			"dist/nodes/AggregateByField/AggregateByField.node.js"
 		]
 	},
+	"dependencies": {
+		"lodash": "^4.17.21"
+	},
 	"devDependencies": {
+		"@types/lodash": "^4.17.23",
 		"@types/node": "^20.10.0",
 		"eslint": "^8.56.0",
 		"gulp": "^4.0.2",

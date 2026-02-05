@@ -1,3 +1,4 @@
+import get from 'lodash/get';
 import type {
 	IExecuteFunctions,
 	INodeExecutionData,
@@ -28,9 +29,11 @@ export class AggregateByField implements INodeType {
 				type: 'string',
 				default: '',
 				required: true,
+				// eslint-disable-next-line n8n-nodes-base/node-param-placeholder-miscased-id
 				placeholder: 'e.g. Category',
 				description: 'The name of the field to group the input items by. Items with the same value in this field will be grouped together.',
-				hint: 'Use dot notation for nested fields (e.g. "address.city")',
+				hint: 'Enter the field name as text. Use dot notation for nested fields (e.g. "address.city")',
+				requiresDataPath: 'single',
 			},
 			{
 				displayName: 'Output Field Name',
@@ -53,6 +56,13 @@ export class AggregateByField implements INodeType {
 				placeholder: 'Add Option',
 				default: {},
 				options: [
+					{
+						displayName: 'Disable Dot Notation',
+						name: 'disableDotNotation',
+						type: 'boolean',
+						default: false,
+						description: 'Whether to disallow referencing child fields using `parent.child` in the field name',
+					},
 					{
 						displayName: 'Handle Missing Values',
 						name: 'handleMissingValues',
@@ -133,12 +143,18 @@ export class AggregateByField implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 
+		// Handle empty input
+		if (items.length === 0) {
+			return [[]];
+		}
+
 		// Get parameters
-		const fieldToGroupBy = this.getNodeParameter('fieldToGroupBy', 0) as string;
+		const fieldToGroupBy = (this.getNodeParameter('fieldToGroupBy', 0) as string).trim();
 		const outputFieldName = this.getNodeParameter('outputFieldName', 0) as string;
 		const includeGroupKey = this.getNodeParameter('includeGroupKey', 0) as boolean;
 		const options = this.getNodeParameter('options', 0) as IDataObject;
 
+		const disableDotNotation = (options.disableDotNotation as boolean) || false;
 		const handleMissingValues = (options.handleMissingValues as string) || 'skip';
 		const sortGroups = (options.sortGroups as string) || 'none';
 		const includeItemCount = (options.includeItemCount as boolean) || false;
@@ -147,35 +163,30 @@ export class AggregateByField implements INodeType {
 		if (!fieldToGroupBy) {
 			throw new NodeOperationError(
 				this.getNode(),
-				'The "Field To Group By" parameter is required',
+				'No field specified',
+				{ description: 'Please specify a field to group by' },
 			);
 		}
 
-		// Helper function to get nested field value using dot notation
-		const getNestedValue = (obj: IDataObject, path: string): unknown => {
-			const keys = path.split('.');
-			let value: unknown = obj;
-
-			for (const key of keys) {
-				if (value === null || value === undefined) {
-					return undefined;
-				}
-				if (typeof value === 'object' && value !== null) {
-					value = (value as IDataObject)[key];
-				} else {
-					return undefined;
-				}
-			}
-
-			return value;
-		};
+		// Track if field was found in any item (for helpful hints)
+		const fieldFoundInItems: boolean[] = [];
 
 		// Group the items
 		const grouped: Map<string, IDataObject[]> = new Map();
 
 		for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
 			const item = items[itemIndex];
-			let groupKey = getNestedValue(item.json, fieldToGroupBy);
+			let groupKey: unknown;
+
+			// Get the field value using lodash get (like Aggregate node does)
+			if (!disableDotNotation) {
+				groupKey = get(item.json, fieldToGroupBy);
+			} else {
+				groupKey = item.json[fieldToGroupBy];
+			}
+
+			// Track whether field was found
+			fieldFoundInItems.push(groupKey !== undefined);
 
 			// Handle missing/undefined values
 			if (groupKey === undefined || groupKey === null) {
@@ -204,6 +215,19 @@ export class AggregateByField implements INodeType {
 			grouped.get(keyString)!.push(item.json);
 		}
 
+		// Add execution hint if field wasn't found in any items
+		if (fieldFoundInItems.every((found) => !found)) {
+			this.addExecutionHints({
+				message: `The field '${fieldToGroupBy}' wasn't found in any input item`,
+				location: 'outputPane',
+			});
+		}
+
+		// If all items were skipped and no groups created, return empty
+		if (grouped.size === 0) {
+			return [[]];
+		}
+
 		// Get group keys and optionally sort them
 		let groupKeys = Array.from(grouped.keys());
 
@@ -220,10 +244,13 @@ export class AggregateByField implements INodeType {
 
 			if (includeGroupKey) {
 				// Handle nested field names - use the last part as the key name
-				const keyName = fieldToGroupBy.includes('.')
-					? fieldToGroupBy.split('.').pop()!
-					: fieldToGroupBy;
-				outputJson[keyName] = key;
+				// e.g., "user.address.city" becomes "city"
+				const getOutputKeyName = () =>
+					!disableDotNotation && fieldToGroupBy.includes('.')
+						? fieldToGroupBy.split('.').pop()!
+						: fieldToGroupBy;
+						
+				outputJson[getOutputKeyName()] = key;
 			}
 
 			outputJson[outputFieldName] = groupItems;
@@ -234,7 +261,7 @@ export class AggregateByField implements INodeType {
 
 			return {
 				json: outputJson,
-				pairedItem: { item: 0 }, // Link to first input item for debugging
+				pairedItem: Array.from({ length: groupItems.length }, (_, i) => ({ item: i })),
 			};
 		});
 
